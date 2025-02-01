@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>الأكواد</title>
+  <style>
+    .code {
+      padding: 10px;
+      border: 1px solid gray;
+      margin-bottom: 5px;
+      cursor: pointer;
+    }
+    .used {
+      color: red;
+    }
+    .available {
+      color: green;
+    }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB4OqWsLGnv828iCNR5yHMHHIA3FpnS0Mw",
+      authDomain: "leader-web.firebaseapp.com",
+      projectId: "leader-web",
+      storageBucket: "leader-web.firebasestorage.app",
+      messagingSenderId: "682778965231",
+      appId: "1:682778965231:web:55ccfb24cb1bb86918d71a",
+      measurementId: "G-2MKRDSZ49T"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const codesContainer = document.getElementById('codes-container');
+
+    db.collection('codes').onSnapshot((snapshot) => {
+      codesContainer.innerHTML = '';
+
+      snapshot.forEach((doc) => {
+        const codeData = doc.data();
+        const codeDiv = document.createElement('div');
+        codeDiv.classList.add('code');
+        codeDiv.textContent = codeData.code;
+        codeDiv.id = doc.id;
+
+        if (codeData.used) {
+          codeDiv.classList.add('used');
+        } else {
+          codeDiv.classList.add('available');
+        }
+
+        codeDiv.addEventListener('click', () => {
+          navigator.clipboard.writeText(codeData.code).then(() => {
+            db.collection('codes').doc(doc.id).update({ used: true });
+          });
+        });
+
+        codesContainer.appendChild(codeDiv);
+      });
+    });
+  </script>
+</head>
+<body>
+  <h1>الأكواد المتاحة</h1>
+  <div id="codes-container"></div>
+</body>
+</html>
